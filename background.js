@@ -1,6 +1,5 @@
-chrome.runtime.onStartup.addListener(init)
+chrome.runtime.onInstalled.addListener(init)
 
-chrome.runtime.onInstalled.addListener(load_bookmarks)
 chrome.bookmarks.onChanged.addListener(load_bookmarks)
 chrome.bookmarks.onChildrenReordered.addListener(load_bookmarks)
 chrome.bookmarks.onCreated.addListener(load_bookmarks)
@@ -16,10 +15,9 @@ function init () {
     for (let i = 0; i < 10; i++) {
         bookmarks_bar_structure.push({url : undefined, config : undefined})
     }
-    chrome.storage.set({
+    chrome.storage.local.set({
         bookmarks_bar : bookmarks_bar_structure
-    })
-    load_bookmarks()
+    }, load_bookmarks)
 }
 
 function load_bookmarks () {
@@ -29,7 +27,6 @@ function load_bookmarks () {
                 storage.bookmarks_bar[i].url = class_to_string(new URL(bookmarks[i].url))
             }
             chrome.storage.local.set({bookmarks_bar : storage.bookmarks_bar})
-            console.log(storage.bookmarks_bar)
         })
     })
 }

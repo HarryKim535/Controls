@@ -1,0 +1,44 @@
+{
+    "manifest_version": 2,
+    "name": "Controls",
+    "version": "1.0",
+    "description": "Every tweak I need",
+    "permissions": ["storage", "bookmarks", "tabs"],
+    "background": {
+        "scripts": ["background.js"],
+        "persistent": false
+    },
+    "icons": {
+        "16": "icons/audio_active_16.png",
+        "32": "icons/audio_active_32.png",
+        "48": "icons/audio_active_48.png",
+        "128": "icons/audio_active_128.png"
+    },
+    "commands": {
+        "bookmarks_bar_1": {
+            "suggested_key": {
+                "default": "Alt+1"
+            },
+            "description": "Open First Bookmark in Bookmarks Bar"
+        },
+        "bookmarks_bar_2": {
+            "suggested_key": {
+                "default": "Alt+2"
+            },
+            "description": "Open Second Bookmark in Bookmarks Bar"
+        },
+        "bookmarks_bar_3": {
+            "suggested_key": {
+                "default": "Alt+3"
+            },
+            "description": "Open Third Bookmark in Bookmarks Bar"
+        },
+        "bookmarks_bar_4": {
+            "suggested_key": {
+                "default": "Alt+4"
+            },
+            "description": "Open Forth Bookmark in Bookmarks Bar"
+        }
+    }
+
+}

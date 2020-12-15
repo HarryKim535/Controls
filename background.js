@@ -1,4 +1,5 @@
-chrome.runtime.onInstalled.addListener(init)
+chrome.runtime.onStartup.addListener(init)
+chrome.runtime.onInstalled.addListener(load_bookmarks)
 
 chrome.bookmarks.onChanged.addListener(load_bookmarks)
 chrome.bookmarks.onChildrenReordered.addListener(load_bookmarks)
@@ -7,44 +8,60 @@ chrome.bookmarks.onImportEnded.addListener(load_bookmarks)
 chrome.bookmarks.onMoved.addListener(load_bookmarks)
 chrome.bookmarks.onRemoved.addListener(load_bookmarks)
 
+chrome.commands.onCommand.addListener(open_bookmarks)
 chrome.runtime.onMessage.addListener(listener)
-chrome.commands.onCommand.addListener(listener)
 
 function init () {
-    var bookmarks_bar_structure = []
-    for (let i = 0; i < 10; i++) {
-        bookmarks_bar_structure.push({url : undefined, config : undefined})
-    }
-    chrome.storage.local.set({
-        bookmarks_bar : bookmarks_bar_structure
-    }, load_bookmarks)
+   config()
 }
 
-function load_bookmarks () {
-    chrome.storage.local.get(['bookmarks_bar'], (storage) => {
-        chrome.bookmarks.getChildren('1', (bookmarks) => {
-            for (let i in bookmarks) {
-                storage.bookmarks_bar[i].url = class_to_string(new URL(bookmarks[i].url))
-            }
-            chrome.storage.local.set({bookmarks_bar : storage.bookmarks_bar})
-        })
-    })
+async function load_bookmarks () {
+    let alt = new Array(10)
+    let bookmarks_promise = get_promise('bookmarks')
+    for (let i in await bookmarks_promise) {
+        alt[i] = analyze_url((await bookmarks_promise)[i].url)
+    }
+    chrome.storage.local.set({alt : alt})
 }
 
-function class_to_string (url_class) {
-    return {
-        href : url_class.href,
-        host : url_class.hostname,
-        path : url_class.pathname,
-        search : url_class.search,
-        hash : url_class.hash
+function config () {
+    
+}
+
+async function open_bookmarks (command) {
+    let alt_promise = get_promise('alt')
+    console.await
+    let re = /(\w+)_(\d)/
+    let [_, key, index] = command.match(re)
+    if (key == 'alt') {
+        chrome.tabs.create({url: (await alt_promise)[index].href})
     }
+    
 }
 
 function listener (message) {
-
+    
 }
 
-function open_url (url) {
+function get_promise (key) {
+    return new Promise((resolve, reject) => {
+        if (key == 'bookmarks') {
+            chrome.bookmarks.getChildren('1', (bookmarks) => {resolve(bookmarks)})
+        }
+        if (key = 'alt') {
+            chrome.storage.local.get(['alt'], (storage) => {resolve(storage.alt)})
+        }
+        else reject()
+    })
+}
 
+function analyze_url (url_string) {
+    let url_object = new URL(url_string)
+    return {
+        href : url_object.href,
+        host : url_object.hostname,
+        path : url_object.pathname,
+        search : url_object.search,
+        hash : url_object.hash
+    }
 }

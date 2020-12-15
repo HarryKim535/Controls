@@ -40,7 +40,7 @@ async function open_bookmarks (command) {
 }
 
 function listener (message) {
-    
+    console.log(message)
 }
 
 function get_promise (key) {

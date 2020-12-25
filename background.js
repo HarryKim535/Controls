@@ -29,7 +29,7 @@ function config (compressor) {
 
 async function loadBookmarks () {
     let alt = new Array(10)
-    let bookmarks = await getPromise('bookmarks')
+    let bookmarks = await getStorage('bookmarks')
     for (let i in bookmarks) {
         alt[i] = analyzeUrl(bookmarks[i].url)
     }
@@ -37,7 +37,7 @@ async function loadBookmarks () {
 }
 
 async function openBookmarks (command) {
-    let alt_promise = getPromise('alt')
+    let alt_promise = getStorage('alt')
     let re = /(\w+)_(\d)/
     let [_, key, index] = command.match(re)
     if (key == 'alt') {
@@ -49,28 +49,32 @@ function createTab (url) {
     chrome.tabs.create({url: url})
 }
 
-async function listener (message, sender, respond) {
+function listener (message, sender, respond) {
     if (message.to == 'background') {
         if (message.from == 'content') {
             if (message.type == 'values') {
-                respond(await getValues(message.content))
+                getValues(analyzeUrl(message.content)).then(values => {respond(values)})
             }
         }
-    } 
+        else if (message.from == 'popup') {
+            if (message.type == 'values') {
+                getValues(analyzeUrl(message.content)).then(values => {respond(values)})
+            }
+        }
+    }
 }
 
 async function getValues (url) {
     let values
-    let config = await getPromise('config')
-    console.log(config)
+    let config = await getStorage('config')
     let host = config[url.host]
-    if (!host) values = config.defaultValues
+    if (host == undefined) values = config.defaultValues
     else {
         let path = host[url.path]
-        if (!path) values = host.values
+        if (path == undefined) values = host.values
         else {
             let search = path[url.search]
-            if (!search) values = path.values
+            if (search == undefined) values = path.values
             else {
                 values = search.valuses
             }
@@ -79,7 +83,7 @@ async function getValues (url) {
     return values
 }
 
-function getPromise (key) {
+function getStorage (key) {
     return new Promise((resolve, reject) => {
         if (key == 'bookmarks') {
             chrome.bookmarks.getChildren('1', bookmarks => {resolve(bookmarks)})

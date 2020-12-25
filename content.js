@@ -9,8 +9,8 @@ function getCompressor (values, audioContext) {
 
 function request (to, type, content) {
     return new Promise((resolve) => {
-        if (to == 'backgound') {
-            chrome.runtime.sendMessage({to: to, from: 'content', type: type, content: content}, response => {resolve(response)})
+        if (to == 'background') {
+            chrome.runtime.sendMessage({to: to, from: 'content', type: type, content: content}, response => {console.log(response);resolve(response)})
         }
     })
 }
@@ -20,15 +20,15 @@ function loadValues () {
 }
 
 async function listener (message, sender, respond) {
-    console.log(message)
     if (message.to == 'content') {
         if (message.from == 'popup') {
-            if (message.type == 'setup') {
-                let audio = getAudio()
-                if (!audio) {
-                    respond('no audio')
+            if (message.type == 'audio?') {
+                if (getAudio() == null) {
+                    respond(null)
                 }
-                else respond(await request('background', 'values', document.URL))
+                else {
+                    respond(location.href)
+                }
             }
         }
     }

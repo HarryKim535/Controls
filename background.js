@@ -51,9 +51,11 @@ function createTab (url) {
 
 async function listener (message, sender, respond) {
     if (message.to == 'background') {
-        if (message.from == 'content')
-            if (message.content == 'values')
-        respond(await getValues(message.content))
+        if (message.from == 'content') {
+            if (message.type == 'values') {
+                respond(await getValues(message.content))
+            }
+        }
     } 
 }
 

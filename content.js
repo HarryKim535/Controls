@@ -1,5 +1,3 @@
-chrome.runtime.onMessage.addListener(listener)
-
 function getCompressor (values, audioContext) {
     let compressor = audioContext.createDynamicsCompressor()
     compressor.threshold.linearRampToValueAtTime(values.threshold, audioContext.currentTime + .5)
@@ -9,9 +7,11 @@ function getCompressor (values, audioContext) {
     return compressor
 }
 
-function getValues () {
+function request (to, type, content) {
     return new Promise((resolve) => {
-        chrome.runtime.sendMessage({to: 'background', from: 'content', content: location.href}, (response) => {resolve(response)})
+        if (to == 'backgound') {
+            chrome.runtime.sendMessage({to: to, from: 'content', type: type, content: content}, response => {resolve(response)})
+        }
     })
 }
 
@@ -20,14 +20,15 @@ function loadValues () {
 }
 
 async function listener (message, sender, respond) {
+    console.log(message)
     if (message.to == 'content') {
         if (message.from == 'popup') {
-            if (message.content == 'popup loaded') {
+            if (message.type == 'setup') {
                 let audio = getAudio()
                 if (!audio) {
                     respond('no audio')
                 }
-                else respond(await getValues())
+                else respond(await request('background', 'values', document.URL))
             }
         }
     }
@@ -46,12 +47,14 @@ function toggleCompressor (source, compressor, destination) {
     compressor.connect(destination)
 }
 
+chrome.runtime.onMessage.addListener(listener)
+
 window.onload = async function () {
     let audio = getAudio()
     if (!audio) {
         return
     }
-    let values = await getValues()
+    let values = await request('background', 'values', document.URL)
     console.log(values)
     let audioContext = new AudioContext()
     let source = audioContext.createMediaElementSource(audio)

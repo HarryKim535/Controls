@@ -4,10 +4,26 @@
         <meta charset="utf-8">
         <script src="popup.js"></script>
         <style>
+            .audio-on {
+                display: none;
+            }
         </style>
     </head>
     <body>
-        <div id="display">
+        <div id="title">
+        </div>
+        <div class="audio-on" id="compressor">
+            <div>
+                <input type="range">
+                <input type="range">
+                <input type="range">
+                <input type="range">
+                <input type="range">
+            </div>
+            <div>
+                <canvas id="plot" width="280px" height="280px" style="border: solid 1px;">
+                </canvas>
+            </div>
         </div>
     </body>
 </html>

@@ -19,10 +19,11 @@ function init () {
 function config (compressor) {
     chrome.storage.local.set({config : {
         defaultValues : {
-            "threshold" : compressor.threshold.defaultValue,
-            "knee" : compressor.knee.defaultValue,
-            "ratio" : compressor.ratio.defaultValue,
-            "release" : compressor.release.defaultValue
+            "threshold": compressor.threshold.defaultValue,
+            "knee": compressor.knee.defaultValue,
+            "ratio": compressor.ratio.defaultValue,
+            "release": compressor.release.defaultValue,
+            "reduction": compressor.reduction.defaultValue
         }
     }})
 }

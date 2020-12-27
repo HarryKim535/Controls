@@ -29,45 +29,47 @@ function config (compressor) {
 }
 
 async function loadBookmarks () {
-    let alt = new Array(10)
-    let bookmarks = await getStorage('bookmarks')
-    for (let i in bookmarks) {
-        alt[i] = analyzeUrl(bookmarks[i].url)
-    }
-    chrome.storage.local.set({alt : alt})
+    chrome.bookmarks.getChildren('1', bookmarks => {
+        let alt = new Array(10)
+        for (let i in bookmarks) {
+            alt[i] = analyzeUrl(bookmarks[i].url)
+        }
+        chrome.storage.local.set({alt : alt})
+    })
 }
 
-async function openBookmarks (command) {
-    let alt_promise = getStorage('alt')
-    let re = /(\w+)_(\d)/
-    let [_, key, index] = command.match(re)
-    if (key == 'alt') {
-        createTab((await alt_promise)[index].href)
-    }
-}
-
-function createTab (url) {
-    chrome.tabs.create({url: url})
+function openBookmarks (command) {
+    chrome.storage.local.get(['alt'], ({alt}) => {
+        let re = /(\w+)_(\d)/
+        let [_, key, index] = command.match(re)
+        if (key == 'alt') {
+            chrome.tabs.create({url: alt[index].href})
+        }
+    })
 }
 
 function listener (message, sender, respond) {
     if (message.to == 'background') {
         if (message.from == 'content') {
             if (message.type == 'values') {
-                getValues(analyzeUrl(message.content)).then(values => {respond(values)})
+                chrome.storage.get(['config'], ({config}) => {
+                    respond(getValues(config, analyzeUrl(message.content)))
+                })
             }
         }
         else if (message.from == 'popup') {
             if (message.type == 'values') {
-                getValues(analyzeUrl(message.content)).then(values => {respond(values)})
+                chrome.storage.get(['config'], ({config}) => {
+                    respond(getValues(config, analyzeUrl(message.content)))
+                })
             }
         }
     }
+    return true
 }
 
-async function getValues (url) {
+function getValues (config, url) {
     let values
-    let config = await getStorage('config')
     let host = config[url.host]
     if (host == undefined) values = config.defaultValues
     else {
@@ -77,7 +79,7 @@ async function getValues (url) {
             let search = path[url.search]
             if (search == undefined) values = path.values
             else {
-                values = search.valuses
+                values = search.values
             }
         }
     }

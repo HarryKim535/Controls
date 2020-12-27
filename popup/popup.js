@@ -1,18 +1,7 @@
-function request (to, type, content) {
-    return new Promise((resolve, reject) => {
-        if (to == 'content') {
-            chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-                chrome.tabs.sendMessage(tabs[0].id, {to: to, from: 'popup', type: type, cotent: content}, response => {resolve(response)})
-            })
-        }
-        else if (to == 'background') {
-            chrome.runtime.sendMessage({to: to, from: 'popup', type: type, content: content}, response => {resolve(response)})
-        }
-        else reject()
-    })
-}
+let currentValues
 
 function draw (canvas, values) {
+    console.log(values)
     let context = canvas.getContext('2d')
     let origin = {x: canvas.width*(6/7), y: canvas.height*(1/7)}
     let ratio = canvas.height/canvas.width
@@ -23,7 +12,8 @@ function draw (canvas, values) {
     let rIntersect = {x: values.threshold*span, y: slope*values.threshold*span}
     let rKneeStart = {x: kneeRange.from*span, y: rIntersect.y + (ratio*(rIntersect.x-kneeRange.from*span))}
     
-    
+    context.clearRect(0, 0, canvas.width, canvas.height)
+
     let gap = canvas.height/14
     context.beginPath()
     for (let i = 0; i < 15; i++) {
@@ -64,21 +54,51 @@ function draw (canvas, values) {
     context.fillText('dB', gap*13, canvas.height - 15)
 }
 
-window.onload = async function () {
-    let title = document.querySelector('#title')
-    let text = document.createElement('h2')
-    title.append(text)
-    text.innerHTML = 'Loading'
+function update (type, value) {
+    currentValues[type] = value
+    draw(document.querySelector('canvas'), currentValues)
+}
 
-    let response = await request('content', 'audio?', 'popup loaded')
-    if (response == null) {
-        text.innerHTML = 'No Audio'
-    }
-    else {
-        let values = await request('background', 'values', response)
-        text.innerHTML = JSON.stringify(values)
-        document.querySelector('.audio-on').style = 'display: block'
-        let canvas = document.querySelector('#plot')
-        draw(canvas, values)
-    }
+function connect (target) {
+    target.nextElementSibling.innerHTML = target.value
+    target.nextElementSibling.style.left = 100*(target.value-target.min)/(target.max-target.min) + '%'
+}
+
+window.onload = function () {
+    let  title = document.querySelector('.title')
+    title.innerHTML = 'Loading'
+    chrome.tabs.query({active: true, currentWindow: true}, tabs => {
+        chrome.tabs.sendMessage(tabs[0].id, {to: 'content', from: 'popup', type: 'audio?', cotent: 'popup loaded'}, response => {
+            if (response === undefined) {
+                title.innerHTML = 'Connection Denied'
+            }
+            else if (response === null) {
+                title.innerHTML = 'No Audio'
+            }
+            else {
+                chrome.runtime.sendMessage({to: 'background', from: 'popup', type: 'values', content: response}, values => {
+                    title.innerHTML = JSON.stringify(values)
+                    document.querySelector('.audio-on').style = 'display: flex'
+                    let canvas = document.querySelector('#plot')
+                    draw(canvas, values)
+                    let oncanvas = ['threshold', 'knee', 'ratio', 'reduction']
+                    for (let item of oncanvas) {
+                        let slider = document.querySelector('#'+item)
+                        slider.onfocus = ({target}) => {
+                            connect(target)
+                        }
+                        slider.oninput = ({target}) => {
+                            connect(target)
+                            update(target.id, Number(target.value))
+                        }
+                    }
+                    let slider = document.querySelector('#release')
+                    slider.onfocus = slider.oninput = ({target}) => {
+                        connect(target)
+                        //apply(target.id, Number(target.value))
+                    }
+                })
+            }
+        })
+    })
 }

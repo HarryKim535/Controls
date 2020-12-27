@@ -3,26 +3,42 @@
     <head>
         <meta charset="utf-8">
         <script src="popup.js"></script>
-        <style>
-            .audio-on {
-                display: none;
-            }
-        </style>
+        <link rel="stylesheet" href="popup.css">
     </head>
     <body>
-        <div id="title">
+        <div id="display">
+            <div class="title"></div>
+            <div class="slider" id="url-container">
+                <input id="url" type="range" max="2" min="0" value="2" step="1">
+                <div class="indicator"></div>
+            </div>
         </div>
         <div class="audio-on" id="compressor">
-            <div>
-                <input type="range">
-                <input type="range">
-                <input type="range">
-                <input type="range">
-                <input type="range">
-            </div>
-            <div>
-                <canvas id="plot" width="280px" height="280px" style="border: solid 1px;">
+            <div class="container">
+                <canvas id="plot" width="280px" height="280px">
                 </canvas>
+                <div class="slider oncanvas" id="threshold-container">
+                    <input id="threshold" type="range" title="threshold" max="0" min="-100" value="-24" step="2" >
+                    <div class="indicator"></div>
+                </div>
+                <div class="slider oncanvas" id="knee-container">
+                    <input id="knee" type="range" title="knee" max="40" min="0" value="30" step="1">
+                    <div class="indicator"></div>
+                </div>
+                <div class="slider oncanvas" id="ratio-container">
+                    <input id="ratio" type="range" title="ratio" max="20" min="1" value="12" step="1">
+                    <div class="indicator"></div>
+                </div>
+                <div class="slider oncanvas" id="reduction-container">
+                    <input id="reduction" type="range" title="reduction" max="0" min="-20" value="0" step="1">
+                    <div class="indicator"></div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="slider" id="release-container">
+                    <input id="release" type="range" title="release" max="1" min="0" value="0.25" step="0.05">
+                    <div class="indicator"></div>
+                </div>
             </div>
         </div>
     </body>

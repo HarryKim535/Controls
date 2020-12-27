@@ -7,23 +7,15 @@ function getCompressor (values, audioContext) {
     return compressor
 }
 
-function request (to, type, content) {
-    return new Promise((resolve) => {
-        if (to == 'background') {
-            chrome.runtime.sendMessage({to: to, from: 'content', type: type, content: content}, response => {console.log(response);resolve(response)})
-        }
-    })
-}
-
 function loadValues () {
     
 }
 
-async function listener (message, sender, respond) {
+function listener (message, sender, respond) {
     if (message.to == 'content') {
         if (message.from == 'popup') {
             if (message.type == 'audio?') {
-                if (getAudio() == null) {
+                if (getAudio() === null) {
                     respond(null)
                 }
                 else {
@@ -32,6 +24,7 @@ async function listener (message, sender, respond) {
             }
         }
     }
+    return false
 }
 
 
@@ -49,16 +42,17 @@ function toggleCompressor (source, compressor, destination) {
 
 chrome.runtime.onMessage.addListener(listener)
 
-window.onload = async function () {
+window.onload = function () {
     let audio = getAudio()
     if (!audio) {
         return
     }
-    let values = await request('background', 'values', document.URL)
-    console.log(values)
-    let audioContext = new AudioContext()
-    let source = audioContext.createMediaElementSource(audio)
-    let compressor = getCompressor(values, audioContext)
-    toggleCompressor(source, compressor, audioContext.destination)
-    console.log('set')
+    else {
+        chrome.runtime.sendMessage({to: 'background', from: 'content', type: 'values', content: location.href}, values => {
+            let audioContext = new AudioContext()
+            let source = audioContext.createMediaElementSource(audio)
+            let compressor = getCompressor(values, audioContext)
+            toggleCompressor(source, compressor, audioContext.destination)
+        })
+    }
 }

@@ -11,20 +11,19 @@ function loadValues () {
     
 }
 
-function listener (message, sender, respond) {
+function listener (message) {
     if (message.to == 'content') {
         if (message.from == 'popup') {
             if (message.type == 'audio?') {
                 if (getAudio() === null) {
-                    respond(null)
+                    chrome.runtime.sendMessage({to: 'popup', from: 'content', type: 'url', content: null})
                 }
                 else {
-                    respond(location.href)
+                    chrome.runtime.sendMessage({to: 'popup', from: 'content', type: 'url', content: location.href})
                 }
             }
         }
     }
-    return false
 }
 
 

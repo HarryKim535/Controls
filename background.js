@@ -48,19 +48,21 @@ function openBookmarks (command) {
     })
 }
 
-function listener (message, sender, respond) {
+function listener (message) {
     if (message.to == 'background') {
         if (message.from == 'content') {
             if (message.type == 'values') {
                 chrome.storage.get(['config'], ({config}) => {
-                    respond(getValues(config, analyzeUrl(message.content)))
+                    chrome.tabs.query({active: true, currentWindow: true}, tabs => {
+                        chrome.tabs.sendMessage(tabs[0].id, {to: 'content', from: 'background', type: 'values', cotent: getValues(config, analyzeUrl(message.content))})
+                    })
                 })
             }
         }
         else if (message.from == 'popup') {
             if (message.type == 'values') {
                 chrome.storage.get(['config'], ({config}) => {
-                    respond(getValues(config, analyzeUrl(message.content)))
+                    chrome.runtime.sendMessage({to: 'popup', from: 'background', type: 'values', content: getValues(config, analyzeUrl(message.content))})
                 })
             }
         }

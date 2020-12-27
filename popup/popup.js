@@ -1,3 +1,4 @@
+let currentUrl
 let currentValues
 
 function draw (canvas, values) {
@@ -64,41 +65,56 @@ function connect (target) {
     target.nextElementSibling.style.left = 100*(target.value-target.min)/(target.max-target.min) + '%'
 }
 
-window.onload = function () {
+function listener (message) {
+    if (message.to == 'popup') {
+        if (message.from == 'content') {
+            if (message.type == 'url') {
+                if (message.content === undefined) {
+                    document.querySelector('.title').innerHTML = 'Connection Denied'
+                }
+                else if (message.content === null) {
+                    document.querySelector('.title').innerHTML = 'No Audio'
+                }
+                else {
+                    currentUrl = message.content
+                    chrome.runtime.sendMessage({to: 'background', from: 'popup', type: 'values', content: message.content})
+                }
+            }
+        }
+        else if (message.from == 'background') {
+            if (message.type == 'values') {
+                currentValues = message.content
+                document.querySelector('.title').innerHTML = currentUrl
+                document.querySelector('.audio-on').style = 'display: flex'
+                let canvas = document.querySelector('#plot')
+                draw(canvas, message.content)
+                let oncanvas = ['threshold', 'knee', 'ratio', 'reduction']
+                for (let item of oncanvas) {
+                    let slider = document.querySelector('#' + item)
+                    slider.onfocus = ({target}) => {
+                        connect(target)
+                    }
+                    slider.oninput = ({target}) => {
+                        connect(target)
+                        update(target.id, Number(target.value))
+                    }
+                }
+                let slider = document.querySelector('#release')
+                slider.onfocus = slider.oninput = ({target}) => {
+                    connect(target)
+                    //apply(target.id, Number(target.value))
+                }
+            }
+        }
+    }
+}
+
+chrome.runtime.onMessage.addListener(listener)
+
+window.onload = () => {
     let  title = document.querySelector('.title')
     title.innerHTML = 'Loading'
     chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-        chrome.tabs.sendMessage(tabs[0].id, {to: 'content', from: 'popup', type: 'audio?', cotent: 'popup loaded'}, response => {
-            if (response === undefined) {
-                title.innerHTML = 'Connection Denied'
-            }
-            else if (response === null) {
-                title.innerHTML = 'No Audio'
-            }
-            else {
-                chrome.runtime.sendMessage({to: 'background', from: 'popup', type: 'values', content: response}, values => {
-                    title.innerHTML = JSON.stringify(values)
-                    document.querySelector('.audio-on').style = 'display: flex'
-                    let canvas = document.querySelector('#plot')
-                    draw(canvas, values)
-                    let oncanvas = ['threshold', 'knee', 'ratio', 'reduction']
-                    for (let item of oncanvas) {
-                        let slider = document.querySelector('#'+item)
-                        slider.onfocus = ({target}) => {
-                            connect(target)
-                        }
-                        slider.oninput = ({target}) => {
-                            connect(target)
-                            update(target.id, Number(target.value))
-                        }
-                    }
-                    let slider = document.querySelector('#release')
-                    slider.onfocus = slider.oninput = ({target}) => {
-                        connect(target)
-                        //apply(target.id, Number(target.value))
-                    }
-                })
-            }
-        })
+        chrome.tabs.sendMessage(tabs[0].id, {to: 'content', from: 'popup', type: 'audio', cotent: 'popup loaded'})
     })
 }

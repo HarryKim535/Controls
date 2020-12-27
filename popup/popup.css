@@ -1,9 +1,8 @@
 body {
-    min-width: 100px;
+    min-width: 80px;
 }
 #display {
     display: flex;
-    width: 500px;
 }
 .title {
     font-size: 1.3em;
@@ -15,7 +14,10 @@ body {
 }
 .container {
     position: relative;
-    margin: 1em
+    margin: 1em;
+}
+#information {
+    width: 6em;
 }
 input[type="range"] {
     appearance: none;
@@ -87,14 +89,15 @@ input[type="range"]:focus + .indicator {
     transform-origin: left;
     transform: rotate(-90deg) translateX(-100%);
 }
-#ratio-container .indicator, #reduction-container .indicator {
+#ratio-container .indicator, #reduction-container .indicator, #release-container .indicator {
     transform: rotate(90deg) translate(0, 40%);
 }
 #release-container {
-    margin-top: 50%;
+    width: 6em;
+    transform-origin: right;
+    transform: rotate(-90deg) translateX(-100%);
 }
 #url-container {
-    width: 10%;
-    transform-origin: bottom;
-    transform: rotate(180deg) translateY(90%); 
+    width: 20%;
+    display: none;
 }

@@ -1,31 +1,6 @@
-function getCompressor (values, audioContext) {
-    let compressor = audioContext.createDynamicsCompressor()
-    compressor.threshold.linearRampToValueAtTime(values.threshold, audioContext.currentTime + .5)
-    compressor.knee.linearRampToValueAtTime(values.knee, audioContext.currentTime + .5)
-    compressor.ratio.linearRampToValueAtTime(values.ratio, audioContext.currentTime + .5)
-    compressor.release.linearRampToValueAtTime(values.release, audioContext.currentTime + .5)
-    return compressor
-}
-
-function loadValues () {
-    
-}
-
-function listener (message) {
-    if (message.to == 'content') {
-        if (message.from == 'popup') {
-            if (message.type == 'audio?') {
-                if (getAudio() === null) {
-                    chrome.runtime.sendMessage({to: 'popup', from: 'content', type: 'url', content: null})
-                }
-                else {
-                    chrome.runtime.sendMessage({to: 'popup', from: 'content', type: 'url', content: location.href})
-                }
-            }
-        }
-    }
-}
-
+let audioContext = new AudioContext()
+let compressor = audioContext.createDynamicsCompressor()
+let source
 
 function getAudio () {
     let audio = document.querySelector('video')
@@ -33,25 +8,61 @@ function getAudio () {
     return audio
 }
 
-function toggleCompressor (source, compressor, destination) {
-    //if on
-    source.connect(compressor)
-    compressor.connect(destination)
+function setCompressor (values) {
+    for (let i in values) {
+        compressor[i].linearRampToValueAtTime(values[i], audioContext.currentTime + 0.2)
+    }
 }
 
-chrome.runtime.onMessage.addListener(listener)
+function getUrl () {
+    return {
+        href : location.href,
+        host : location.hostname,
+        path : location.pathname,
+        search : location.search
+    }
+}
+
+
+function listener (message) {
+    if (message.to == 'content') {
+        if (message.from == 'popup') {
+            if (message.type == 'notification') {
+                if (message.content == 'popup loaded') {
+                    if (getAudio() === null) {
+                        send('popup', 'url', null)
+                    }
+                    else {
+                        send('popup', 'url', getUrl())
+                    }
+                }
+            }
+            else if (message.type == 'apply') {
+                setCompressor(message.content)
+            }
+        }
+        else if (message.from == 'background') {
+            if (message.type == 'values') {
+                setCompressor(message.content)
+            }
+        }
+    }
+}
+
+function send (to, type, content) {
+    chrome.runtime.sendMessage({to: to, from: 'content', type: type, content: content})
+}
 
 window.onload = function () {
-    let audio = getAudio()
-    if (!audio) {
+    chrome.runtime.onMessage.addListener(listener)
+    send('popup', 'notification', 'window loaded')
+    if (!getAudio()) {
         return
     }
     else {
-        chrome.runtime.sendMessage({to: 'background', from: 'content', type: 'values', content: location.href}, values => {
-            let audioContext = new AudioContext()
-            let source = audioContext.createMediaElementSource(audio)
-            let compressor = getCompressor(values, audioContext)
-            toggleCompressor(source, compressor, audioContext.destination)
-        })
+        source = audioContext.createMediaElementSource(getAudio())
+        source.connect(compressor)
+        compressor.connect(audioContext.destination)
+        send('background', 'values', getUrl())
     }
 }

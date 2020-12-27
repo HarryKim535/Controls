@@ -2,12 +2,11 @@ let currentUrl
 let currentValues
 
 function draw (canvas, values) {
-    console.log(values)
     let context = canvas.getContext('2d')
-    let origin = {x: canvas.width*(6/7), y: canvas.height*(1/7)}
+    let span = canvas.width/140
     let ratio = canvas.height/canvas.width
     let slope = -ratio/values.ratio
-    let span = canvas.width/140
+    let origin = {x: canvas.width*(6/7), y: canvas.height*(1/7) - values.reduction*span}
     let kneeRange = {from: values.threshold - (values.knee/2), to: values.threshold + (values.knee/2)}
     let rKneeEnd = {x: kneeRange.to*span, y: slope*kneeRange.to*span}
     let rIntersect = {x: values.threshold*span, y: slope*values.threshold*span}
@@ -60,61 +59,108 @@ function update (type, value) {
     draw(document.querySelector('canvas'), currentValues)
 }
 
+function apply(type, value) {
+    send('content', 'apply', {[type]: value})
+}
+
+function save() {
+    send('background', 'save', {url: currentUrl, values: currentValues})
+}
+
 function connect (target) {
     target.nextElementSibling.innerHTML = target.value
     target.nextElementSibling.style.left = 100*(target.value-target.min)/(target.max-target.min) + '%'
 }
 
 function listener (message) {
+    console.log(message)
     if (message.to == 'popup') {
         if (message.from == 'content') {
             if (message.type == 'url') {
-                if (message.content === undefined) {
-                    document.querySelector('.title').innerHTML = 'Connection Denied'
-                }
-                else if (message.content === null) {
+                if (message.content === null) {
                     document.querySelector('.title').innerHTML = 'No Audio'
                 }
                 else {
                     currentUrl = message.content
-                    chrome.runtime.sendMessage({to: 'background', from: 'popup', type: 'values', content: message.content})
+                    let title = document.querySelector('.title')
+                    let slider = document.querySelector('#url-container')
+                    title.innerHTML = currentUrl.host + currentUrl.path + currentUrl.search
+                    slider.style.display = 'block'
+                    slider.oninput = ({target}) => {
+                        let url = currentUrl.host
+                        currentUrl.range = 0
+                        if (target.value > 0) {
+                            url += currentUrl.path
+                            currentUrl.range += 1
+                        }
+                        if (target.value > 1) {
+                            url += currentUrl.search
+                            currentUrl.range += 1
+                        }
+                        title.innerHTML = url
+                    }
+                    send('background', 'values', currentUrl)
+                }
+            }
+            else if (message.type == 'notification') {
+                if (message.content = 'window loaded') {
+                    document.querySelector('.audio-on').style.display = 'none'
+                    send('content', 'notification', 'popup loaded')
                 }
             }
         }
         else if (message.from == 'background') {
             if (message.type == 'values') {
                 currentValues = message.content
-                document.querySelector('.title').innerHTML = currentUrl
-                document.querySelector('.audio-on').style = 'display: flex'
+                document.querySelector('.audio-on').style.display = 'flex'
+                document.querySelector('#url').value = currentValues.range
+                
                 let canvas = document.querySelector('#plot')
-                draw(canvas, message.content)
+                draw(canvas, currentValues)
                 let oncanvas = ['threshold', 'knee', 'ratio', 'reduction']
                 for (let item of oncanvas) {
                     let slider = document.querySelector('#' + item)
+                    slider.value = currentValues[item]
                     slider.onfocus = ({target}) => {
                         connect(target)
                     }
                     slider.oninput = ({target}) => {
                         connect(target)
+                        currentValues[target.id] = Number(target.value)
+                        apply(target.id, Number(target.value))
+                        save()
                         update(target.id, Number(target.value))
                     }
                 }
                 let slider = document.querySelector('#release')
-                slider.onfocus = slider.oninput = ({target}) => {
+                slider.value = currentValues['release']
+                slider.onfocus = ({target}) => {
                     connect(target)
-                    //apply(target.id, Number(target.value))
+                    currentValues[target.id] = Number(target.value)
+                    apply(target.id, Number(target.value))
+                    save()
                 }
+                slider.oninput = slider.onfocus
             }
         }
     }
 }
 
-chrome.runtime.onMessage.addListener(listener)
+function send (to, type, content) {
+    if (to == 'content') {
+        chrome.tabs.query({active: true, currentWindow: true}, tabs => {
+            chrome.tabs.sendMessage(tabs[0].id, {to: to, from: 'popup', type: type, content: content})
+        })
+    }
+    else {
+        chrome.runtime.sendMessage({to: to, from: 'popup', type: type, content: content})
+    }
+}
+
 
 window.onload = () => {
+    chrome.runtime.onMessage.addListener(listener)
     let  title = document.querySelector('.title')
     title.innerHTML = 'Loading'
-    chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-        chrome.tabs.sendMessage(tabs[0].id, {to: 'content', from: 'popup', type: 'audio', cotent: 'popup loaded'})
-    })
+    send('content', 'notification', 'popup loaded')
 }

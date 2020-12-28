@@ -72,6 +72,21 @@ function connect (target) {
     target.nextElementSibling.style.left = 100*(target.value-target.min)/(target.max-target.min) + '%'
 }
 
+function setUrl (range) {
+    let url = currentUrl.host
+    let title = document.querySelector('.title')
+    currentValues.range = 0
+    if (range > 0) {
+        url += currentUrl.path
+        currentValues.range += 1
+    }
+    if (range > 1) {
+        url += currentUrl.search
+        currentValues.range += 1
+    }
+    title.innerHTML = url
+}
+
 function listener (message) {
     console.log(message)
     if (message.to == 'popup') {
@@ -84,20 +99,10 @@ function listener (message) {
                     currentUrl = message.content
                     let title = document.querySelector('.title')
                     let slider = document.querySelector('#url-container')
-                    title.innerHTML = currentUrl.host + currentUrl.path + currentUrl.search
+                    title.innerHTML = currentUrl.host
                     slider.style.display = 'block'
                     slider.oninput = ({target}) => {
-                        let url = currentUrl.host
-                        currentUrl.range = 0
-                        if (target.value > 0) {
-                            url += currentUrl.path
-                            currentUrl.range += 1
-                        }
-                        if (target.value > 1) {
-                            url += currentUrl.search
-                            currentUrl.range += 1
-                        }
-                        title.innerHTML = url
+                        setUrl(target.value)
                     }
                     send('background', 'values', currentUrl)
                 }
@@ -112,11 +117,14 @@ function listener (message) {
         else if (message.from == 'background') {
             if (message.type == 'values') {
                 currentValues = message.content
-                document.querySelector('.audio-on').style.display = 'flex'
+                if(currentValues.range === undefined) currentValues.range = 0
+                setUrl(currentValues.range)
                 document.querySelector('#url').value = currentValues.range
+                document.querySelector('.audio-on').style.display = 'flex'
                 
                 let canvas = document.querySelector('#plot')
                 draw(canvas, currentValues)
+                
                 let oncanvas = ['threshold', 'knee', 'ratio', 'reduction']
                 for (let item of oncanvas) {
                     let slider = document.querySelector('#' + item)

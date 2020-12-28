@@ -47,7 +47,6 @@ function openBookmarks (command) {
 }
 
 function listener (message) {
-    console.log(message)
     if (message.to == 'background') {
         if (message.from == 'content') {
             if (message.type == 'values') {
@@ -67,24 +66,26 @@ function listener (message) {
                     let url = message.content.url
                     let values = message.content.values
                     if (!audio[url.host]) audio[url.host] = {}
-                    if (url.range == 0) {
-                        audio[url.host].values = values
-                        chrome.storage.local.set({audio: audio}, () => 0)
-                        continue
+                    if (values.range == 0) {
+                        audio[url.host]['values'] = values
+                        console.log(audio)
+                        chrome.storage.local.set({audio: audio})
+                        return
                     }
                     else {
                         if (!audio[url.host][url.path]) audio[url.host][url.path] = {}
-                        if (url.range == 1) {
-                            audio[url.host][url.path].values = values
-                            chrome.storage.local.set({audio: audio}, () => 0)
-                            continue
+                        if (values.range == 1) {
+                            audio[url.host][url.path]['values'] = values
+                            console.log(audio)
+                            chrome.storage.local.set({audio: audio})
+                            return
                         }
                         else {
-                            console.log(audio)
                             if (!audio[url.host][url.path][url.search]) audio[url.host][url.path][url.search] = {}
-                            audio[url.host][url.path][url.search].values = values
-                            chrome.storage.local.set({audio: audio}, () => 0)
-                            continue
+                            audio[url.host][url.path][url.search]['values'] = values
+                            console.log(audio)
+                            chrome.storage.local.set({audio: audio})
+                            return
                         }
                     }
                 })

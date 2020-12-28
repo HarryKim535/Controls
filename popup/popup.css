@@ -1,23 +1,26 @@
 body {
     min-width: 80px;
 }
-#display {
+.bundle {
     display: flex;
+}
+.container {
+    position: relative;
+    margin: 1em;
 }
 .title {
     font-size: 1.3em;
     font-weight: bolder;
     width: 90%;
 }
-.audio-on {
+.onurl {
     display: none;
 }
-.container {
-    position: relative;
-    margin: 1em;
+.onaudio {
+    display: none;
 }
-#information {
-    width: 6em;
+.onchange {
+    display: none;
 }
 input[type="range"] {
     appearance: none;
@@ -82,14 +85,14 @@ input[type="range"]:focus + .indicator {
     transform: rotate(-90deg)
 }
 
-#reduction-container {
+#gain-container {
     left: 10%;
     top: 15%;
     width: 35%;
     transform-origin: left;
     transform: rotate(-90deg) translateX(-100%);
 }
-#ratio-container .indicator, #reduction-container .indicator, #release-container .indicator {
+#ratio-container .indicator, #gain-container .indicator, #release-container .indicator {
     transform: rotate(90deg) translate(0, 40%);
 }
 #release-container {

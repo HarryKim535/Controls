@@ -1,6 +1,17 @@
-let audioContext = new AudioContext()
-let compressor = audioContext.createDynamicsCompressor()
+let audioContext
+let compressor
+let gain
 let source
+
+function setup () {
+    audioContext = new AudioContext()
+    compressor = audioContext.createDynamicsCompressor()
+    gain = audioContext.createGain()
+    source = audioContext.createMediaElementSource(getAudio())
+    source.connect(compressor)
+    compressor.connect(gain)
+    gain.connect(audioContext.destination)
+}
 
 function getAudio () {
     let audio = document.querySelector('video')
@@ -9,8 +20,10 @@ function getAudio () {
 }
 
 function setCompressor (values) {
-    for (let i in values) {
-        compressor[i].linearRampToValueAtTime(values[i], audioContext.currentTime + 0.2)
+    for (let item in values) {
+        console.log(item, values[item])
+        if (item == 'gain') gain.gain.exponentialRampToValueAtTime(2**values[item], audioContext.currentTime + 0.2)
+        else compressor[item].linearRampToValueAtTime(values[item], audioContext.currentTime + 0.2)
     }
 }
 
@@ -33,16 +46,19 @@ function listener (message) {
                         send('popup', 'url', null)
                     }
                     else {
+                        if (!audioContext) setup()
                         send('popup', 'url', getUrl())
                     }
                 }
             }
             else if (message.type == 'apply') {
+                delete message.content.range
                 setCompressor(message.content)
             }
         }
         else if (message.from == 'background') {
             if (message.type == 'values') {
+                delete message.content.range
                 setCompressor(message.content)
             }
         }
@@ -60,9 +76,7 @@ window.onload = function () {
         return
     }
     else {
-        source = audioContext.createMediaElementSource(getAudio())
-        source.connect(compressor)
-        compressor.connect(audioContext.destination)
+        setup()
         send('background', 'values', getUrl())
     }
 }

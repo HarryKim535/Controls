@@ -12,130 +12,128 @@ chrome.commands.onCommand.addListener(openBookmarks)
 chrome.runtime.onMessage.addListener(listener)
 
 function init () {
-    config()
+	config()
 }
 function config () {
-    chrome.storage.local.set({audio : {
-        defaultValues : {
-            "threshold": -24,
-            "knee": 30,
-            "ratio": 12,
-            "release": 0.25,
-            "reduction": 0
-        }
-    }})
+	chrome.storage.local.set({audio : {
+		defaultValues : {
+			"threshold": -24,
+			"knee": 30,
+			"ratio": 12,
+			"release": 0.25,
+			"gain": 0,
+			"range": 0
+		}
+	}})
 }
 
 async function loadBookmarks () {
-    chrome.bookmarks.getChildren('1', bookmarks => {
-        let alt = new Array(10)
-        for (let i in bookmarks) {
-            alt[i] = bookmarks[i].url
-        }
-        chrome.storage.local.set({alt : alt})
-    })
+	chrome.bookmarks.getChildren('1', bookmarks => {
+		let alt = new Array(10)
+		for (let i in bookmarks) {
+			alt[i] = bookmarks[i].url
+		}
+		chrome.storage.local.set({alt : alt})
+	})
 }
 
 function openBookmarks (command) {
-    chrome.storage.local.get(['alt'], ({alt}) => {
-        let re = /(\w+)_(\d)/
-        let [_, key, index] = command.match(re)
-        if (key == 'alt') {
-            chrome.tabs.create({url: alt[index]})
-        }
-    })
+	chrome.storage.local.get(['alt'], ({alt}) => {
+		let re = /(\w+)_(\d)/
+		let [_, key, index] = command.match(re)
+		if (key == 'alt') {
+			chrome.tabs.create({url: alt[index]})
+		}
+	})
 }
 
 function listener (message) {
-    if (message.to == 'background') {
-        if (message.from == 'content') {
-            if (message.type == 'values') {
-                chrome.storage.local.get(['audio'], ({audio}) => {
-                    send('content', 'values', getValues(audio, message.content))
-                })
-            }
-        }
-        else if (message.from == 'popup') {
-            if (message.type == 'values') {
-                chrome.storage.local.get(['audio'], ({audio}) => {
-                    send('popup', 'values', getValues(audio, message.content))
-                })
-            }
-            else if (message.type == 'save') {
-                chrome.storage.local.get(['audio'], ({audio}) => {
-                    let url = message.content.url
-                    let values = message.content.values
-                    if (!audio[url.host]) audio[url.host] = {}
-                    if (values.range == 0) {
-                        audio[url.host]['values'] = values
-                        console.log(audio)
-                        chrome.storage.local.set({audio: audio})
-                        return
-                    }
-                    else {
-                        if (!audio[url.host][url.path]) audio[url.host][url.path] = {}
-                        if (values.range == 1) {
-                            audio[url.host][url.path]['values'] = values
-                            console.log(audio)
-                            chrome.storage.local.set({audio: audio})
-                            return
-                        }
-                        else {
-                            if (!audio[url.host][url.path][url.search]) audio[url.host][url.path][url.search] = {}
-                            audio[url.host][url.path][url.search]['values'] = values
-                            console.log(audio)
-                            chrome.storage.local.set({audio: audio})
-                            return
-                        }
-                    }
-                })
-            }
-        }
-    }
+	if (message.to == 'background') {
+		if (message.from == 'content') {
+			if (message.type == 'values') {
+				chrome.storage.local.get(['audio'], ({audio}) => {
+					send('content', 'values', getValues(audio, message.content))
+				})
+			}
+		}
+		else if (message.from == 'popup') {
+			if (message.type == 'values') {
+				chrome.storage.local.get(['audio'], ({audio}) => {
+					send('popup', 'values', getValues(audio, message.content))
+				})
+			}
+			else if (message.type == 'save') {
+				chrome.storage.local.get(['audio'], ({audio}) => {
+					let url = message.content.url
+					let values = message.content.values
+					if (!audio[url.host]) audio[url.host] = {}
+					if (values.range == 0) {
+						audio[url.host]['values'] = values
+						console.log(audio)
+						chrome.storage.local.set({audio: audio})
+						return
+					}
+					else {
+						if (!audio[url.host][url.path]) audio[url.host][url.path] = {}
+						if (values.range == 1) {
+							audio[url.host][url.path]['values'] = values
+							console.log(audio)
+							chrome.storage.local.set({audio: audio})
+							return
+						}
+						else {
+							if (!audio[url.host][url.path][url.search]) audio[url.host][url.path][url.search] = {}
+							audio[url.host][url.path][url.search]['values'] = values
+							console.log(audio)
+							chrome.storage.local.set({audio: audio})
+							return
+						}
+					}
+				})
+			}
+			else if (message.type == 'reload') {
+				chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+						chrome.tabs.executeScript(tabs[0].id, { file: "content.js" });
+				});
+			} 
+		}
+	}
 }
 
 function send (to, type, content) {
-    if (to == 'content') {
-        chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-            chrome.tabs.sendMessage(tabs[0].id, {to: to, from: 'background', type: type, content: content})
-        })
-    }
-    else {
-        chrome.runtime.sendMessage({to: to, from: 'background', type: type, content: content})
-    }
+	if (to == 'content') {
+		chrome.tabs.query({active: true, currentWindow: true}, tabs => {
+			chrome.tabs.sendMessage(tabs[0].id, {to: to, from: 'background', type: type, content: content})
+		})
+	}
+	else {
+		chrome.runtime.sendMessage({to: to, from: 'background', type: type, content: content})
+	}
 }
 
 
 function getValues (audio, url) {
-    let values
-    let range = -1
-    let host = audio[url.host]
-    if (!host) {
-        values = audio.defaultValues
-        values.range = range
-    }
-    else {
-        range += 1
-        let path = host[url.path]
-        if (!path) {
-            values = host.values
-            values.range = range
-        }
-        else {
-            range += 1
-            let search = path[url.search]
-            if (!search) {
-                values = path.values
-                values.range = range
-            }
-            else {
-                range += 1
-                values = search.values
-                values.range = range
-            }
-        }
-    }
-    return values
+	let values
+	let host = audio[url.host]
+	if (!host) {
+		values = audio.defaultValues
+	}
+	else {
+		let path = host[url.path]
+		if (!path) {
+			values = host.values
+		}
+		else {    
+			let search = path[url.search]
+			if (!search) {
+				values = path.values
+			}
+			else {        
+				values = search.values
+			}
+		}
+	}
+	return values
 }
 
 init()

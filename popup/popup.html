@@ -6,14 +6,14 @@
         <link rel="stylesheet" href="popup.css">
     </head>
     <body>
-        <div id="display">
+        <div class="bundle">
             <div class="title"></div>
-            <div class="slider" id="url-container">
-                <input id="url" type="range" max="2" min="0" value="0" step="1">
+            <div class="slider onurl" id="range-container">
+                <input id="range" type="range" max="2" min="0" value="0" step="1">
             </div>
         </div>
-        <div class="audio-on" id="compressor">
-            <div class="container">
+        <div class="bundle">
+            <div class="container onaudio">
                 <canvas id="plot" width="280px" height="280px">
                 </canvas>
                 <div class="slider oncanvas" id="threshold-container">
@@ -28,17 +28,23 @@
                     <input id="ratio" type="range" title="ratio" max="20" min="1" value="12" step="1">
                     <div class="indicator"></div>
                 </div>
-                <div class="slider oncanvas" id="reduction-container">
-                    <input id="reduction" type="range" title="reduction" max="0" min="-20" value="0" step="1">
+                <div class="slider oncanvas" id="gain-container">
+                    <input id="gain" type="range" title="gain" max="0.4" min="-3" value="0" step="0.2">
                     <div class="indicator"></div>
                 </div>
             </div>
-            <div class="container" id="information">
+            <div class="container onaudio">
                 <div class="slider" id="release-container">
                     <input id="release" type="range" title="release" max="1" min="0" value="0.25" step="0.05">
                     <div class="indicator"></div>
                 </div>
+                <div class="onchange">
+                    <input id="discard" type="button" value="Discard">
+                </div>
             </div>
+        </div>
+        <div class="bundle">
+            <input type="button" value="reload content script" id="reload">
         </div>
     </body>
 </html>

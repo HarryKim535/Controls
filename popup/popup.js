@@ -77,14 +77,11 @@ function connect (target) {
 function setUrl (range) {
 	let url = currentUrl.host
 	let title = document.querySelector('.title')
-	currentValues.range = 0
 	if (range > 0) {
 		url += currentUrl.path
-		currentValues.range += 1
 	}
 	if (range > 1) {
 		url += currentUrl.search
-		currentValues.range += 1
 	}
 	title.innerHTML = url
 }
@@ -114,8 +111,8 @@ function listener (message) {
 		}
 		else if (message.from == 'background') {
 			if (message.type == 'values') {
-				Object.assign(originalValues, message.content)
 				currentValues = message.content
+				Object.assign(originalValues, currentUrl)
 				setUrl(currentValues.range)
 				for (let item of sliders.all) document.querySelector('#' + item).value = currentValues[item]
 				for (let element of document.querySelectorAll('.onaudio')) element.style.display = 'inline'
@@ -171,7 +168,7 @@ window.onload = () => {
 		}
 	}
 	document.querySelector('#range').oninput = ({target}) => {
-		setUrl(target.value)
+		setUrl(target.valueAsNumber)
 	}
 	document.querySelector('#discard').onclick = () => {
 		console.log(originalValues)

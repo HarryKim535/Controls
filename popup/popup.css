@@ -104,3 +104,6 @@ input[type="range"]:focus + .indicator {
     width: 20%;
     display: none;
 }
+#reload {
+    display: none
+}

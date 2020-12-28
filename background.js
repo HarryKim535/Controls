@@ -1,5 +1,4 @@
-chrome.runtime.onStartup.addListener(init)
-chrome.runtime.onInstalled.addListener(loadBookmarks)
+chrome.runtime.onInstalled.addListener(init)
 
 chrome.bookmarks.onChanged.addListener(loadBookmarks)
 chrome.bookmarks.onChildrenReordered.addListener(loadBookmarks)
@@ -13,6 +12,7 @@ chrome.runtime.onMessage.addListener(listener)
 
 function init () {
 	config()
+	loadBookmarks()
 }
 function config () {
 	chrome.storage.local.set({audio : {
@@ -48,6 +48,7 @@ function openBookmarks (command) {
 }
 
 function listener (message) {
+	console.log(message)
 	if (message.to == 'background') {
 		if (message.from == 'content') {
 			if (message.type == 'values') {
@@ -113,27 +114,23 @@ function send (to, type, content) {
 
 
 function getValues (audio, url) {
-	let values
 	let host = audio[url.host]
-	if (!host) {
-		values = audio.defaultValues
+	if (host === undefined) {
+		return audio.defaultValues
 	}
 	else {
 		let path = host[url.path]
-		if (!path) {
-			values = host.values
+		if (path === undefined) {
+			return host.values
 		}
-		else {    
+		else {
 			let search = path[url.search]
-			if (!search) {
-				values = path.values
+			if (search === undefined) {
+				return path.values
 			}
-			else {        
-				values = search.values
+			else {
+				return search.values
 			}
 		}
 	}
-	return values
 }
-
-init()

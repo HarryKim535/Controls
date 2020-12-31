@@ -16,13 +16,15 @@ function init () {
 }
 function config () {
 	chrome.storage.local.set({audio : {
-		defaultValues : {
-			"threshold": -24,
-			"knee": 30,
-			"ratio": 12,
-			"release": 0.25,
-			"gain": 0,
-			"range": 0
+		themes: {
+			Default : {
+				"threshold": -24,
+				"knee": 30,
+				"ratio": 12,
+				"release": 0.25,
+				"gain": 0,
+				"range": 0
+			}
 		}
 	}})
 }
@@ -92,6 +94,17 @@ function listener (message) {
 					}
 				})
 			}
+			else if (message.type == 'themes') {
+				chrome.storage.local.get(['audio'], ({audio}) => {
+					send('popup', 'themes', Object.keys(audio.themes))
+				})
+			}
+			else if (message.type == 'theme values') {
+				chrome.storage.local.get(['audio'], ({audio}) => {
+					console.log(audio.themes[message.content])
+					send('popup', 'theme values', audio.themes[message.content])
+				})
+			}
 			else if (message.type == 'reload') {
 				chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
 						chrome.tabs.executeScript(tabs[0].id, { file: "content.js" });
@@ -115,22 +128,22 @@ function send (to, type, content) {
 
 function getValues (audio, url) {
 	let host = audio[url.host]
-	if (host === undefined) {
-		return audio.defaultValues
-	}
-	else {
+	if (host) {
 		let path = host[url.path]
-		if (path === undefined) {
-			return host.values
-		}
-		else {
+		if (path) {
 			let search = path[url.search]
-			if (search === undefined) {
-				return path.values
-			}
-			else {
+			if (search) {
 				return search.values
 			}
+			else {
+				return path.values
+			}
 		}
+		else {
+			return host.values
+		}
+	}
+	else {
+		return audio.themes.Default
 	}
 }

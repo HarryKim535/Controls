@@ -1,17 +1,24 @@
 body {
 	min-width: 80px;
+	padding: 1em;
+	margin: 0;
 }
 .bundle {
 	display: flex;
+	align-items: center;
 }
 .container {
 	position: relative;
-	margin: 1em;
+	display: inline-block;
+	margin: 1em 0;
 }
 .title {
+	width: 80%;
+	position: relative;
+}
+#title {
 	font-size: 1.3em;
 	font-weight: bolder;
-	width: 90%;
 }
 .onurl {
 	display: none;
@@ -84,7 +91,6 @@ input[type="range"]:focus + .indicator {
 	transform-origin: right;
 	transform: rotate(-90deg)
 }
-
 #gain-container {
 	left: 10%;
 	top: 15%;
@@ -100,10 +106,18 @@ input[type="range"]:focus + .indicator {
 	transform-origin: right;
 	transform: rotate(-90deg) translateX(-100%);
 }
-#url-container {
+#range-container {
 	width: 20%;
+}
+#advanced {
 	display: none;
 }
-#reload {
-	display: none
+#datatree {
+	display: none;
+}
+.list {
+	width: 8em;
+	height: 70%;
+	overflow-y: scroll;
+	border: none;
 }

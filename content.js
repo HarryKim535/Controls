@@ -23,7 +23,7 @@ function setCompressor (values) {
 	for (let item in values) {
 		console.log(item, values[item])
 		if (item == 'gain') gain.gain.exponentialRampToValueAtTime(2**values[item], audioContext.currentTime + 0.2)
-		else compressor[item].linearRampToValueAtTime(values[item], audioContext.currentTime + 0.2)
+		else compressor[item].exponentialRampToValueAtTime(values[item], audioContext.currentTime + 0.2)
 	}
 }
 

@@ -7,7 +7,7 @@
 	</head>
 	<body>
 		<div class="bundle">
-			<div class="title"></div>
+			<div class="title"><span id="title"></span></div>
 			<div class="slider onurl" id="range-container">
 				<input id="range" type="range" max="2" min="0" value="0" step="1">
 			</div>
@@ -34,6 +34,11 @@
 				</div>
 			</div>
 			<div class="container onaudio">
+				<input type="radio" name="type" value="none" checked>
+				<input type="radio" name="type" value="advanced">
+				<input type="radio" name="type" value="datatree">
+			</div>
+			<div class="container onaudio" id="advanced">
 				<div class="slider" id="release-container">
 					<input id="release" type="range" title="release" max="1" min="0" value="0.25" step="0.05">
 					<div class="indicator"></div>
@@ -41,9 +46,11 @@
 				<div class="onchange">
 					<input id="discard" type="button" value="Discard">
 				</div>
+				<div class="list" id="themes"></div>
 			</div>
+			<div class="container onaudio" id="datatree"></div>
 		</div>
-		<div class="bundle">
+		<div class="bundle" style="display: none;">
 			<input type="button" value="reload content script" id="reload">
 		</div>
 	</body>

@@ -1,7 +1,7 @@
 let currentUrl
 let currentValues
 let originalValues = {}
-let sliders = {all: ['threshold', 'knee', 'ratio', 'gain', 'release', 'range'], oncanvas: ['threshold', 'knee', 'ratio', 'gain'], onside: ['release'], ontitle: ['url']}
+let sliders = {all: ['threshold', 'knee', 'ratio', 'gain', 'release', 'range'], oncanvas: ['threshold', 'knee', 'ratio', 'gain'], onside: ['release'], ontitle: ['range']}
 
 function draw (canvas, values) {
 	let context = canvas.getContext('2d')
@@ -56,9 +56,10 @@ function draw (canvas, values) {
 	context.fillText('dB', gap*13, canvas.height - 15)
 }
 
-function update (type, value) {
-	currentValues[type] = value
-	draw(document.querySelector('canvas'), currentValues)
+function update (canvas) {
+	if (canvas == 'plot') {
+		draw(document.querySelector('#plot'), currentValues)
+	}
 }
 
 function apply(values) {
@@ -76,14 +77,30 @@ function connect (target) {
 
 function setUrl (range) {
 	let url = currentUrl.host
-	let title = document.querySelector('.title')
+	let title = document.querySelector('#title')
 	if (range > 0) {
 		url += currentUrl.path
 	}
 	if (range > 1) {
 		url += currentUrl.search
 	}
-	title.innerHTML = url
+	title.textContent = url
+}
+
+function setSliders () {
+	for (let item of sliders.all) document.querySelector('#' + item).value = currentValues[item]
+}
+
+function addThemes (name) {
+	let themes = document.querySelector('#themes')
+	let button = document.createElement('input')
+	button.type = 'button'
+	button.value = name
+	button.id = name
+	button.onclick = ({target}) => {
+		send('background', 'theme values', target.id)
+	}
+	themes.appendChild(button)
 }
 
 function listener (message) {
@@ -92,13 +109,13 @@ function listener (message) {
 		if (message.from == 'content') {
 			if (message.type == 'url') {
 				if (message.content === null) {
-					document.querySelector('.title').innerHTML = 'No Audio'
+					document.querySelector('#title').textContent = 'No Audio'
 				}
 				else {
 					currentUrl = message.content
-					let title = document.querySelector('.title')
+					let title = document.querySelector('#title')
 					let slider = document.querySelector('#range-container')
-					title.innerHTML = currentUrl.host
+					title.textContent = currentUrl.host
 					slider.style.display = 'block'
 					send('background', 'values', currentUrl)
 				}
@@ -112,13 +129,23 @@ function listener (message) {
 		else if (message.from == 'background') {
 			if (message.type == 'values') {
 				currentValues = message.content
-				Object.assign(originalValues, currentUrl)
+				Object.assign(originalValues, currentValues)
 				setUrl(currentValues.range)
-				for (let item of sliders.all) document.querySelector('#' + item).value = currentValues[item]
+				setSliders()
+				update('plot')
 				for (let element of document.querySelectorAll('.onaudio')) element.style.display = 'inline'
-				
-				let canvas = document.querySelector('#plot')
-				draw(canvas, currentValues)
+			}
+			else if (message.type == 'themes') {
+				for (let item of message.content) {
+					addThemes(item)
+				}
+			}
+			else if (message.type == 'theme values') {
+				currentValues = message.content
+				setUrl(currentValues.range)
+				setSliders()
+				update('plot')
+				apply(currentValues)
 			}
 		}
 	}
@@ -144,11 +171,11 @@ window.onload = () => {
 			connect(target)
 		}
 		slider.oninput = ({target}) => {
-			connect(target)
 			currentValues[target.id] = target.valueAsNumber
+			connect(target)
+			update('plot')
 			apply({[target.id]: target.valueAsNumber})
 			save()
-			update(target.id, target.valueAsNumber)
 		}
 		slider.onchange = () => {
 			for (let element of document.querySelectorAll('.onchange')) element.style.display = 'block'
@@ -168,23 +195,22 @@ window.onload = () => {
 		}
 	}
 	document.querySelector('#range').oninput = ({target}) => {
+		currentValues.range = target.valueAsNumber
 		setUrl(target.valueAsNumber)
 	}
-	document.querySelector('#discard').onclick = () => {
-		console.log(originalValues)
-		apply(originalValues)
-		for (item of sliders.all) {
-			if (originalValues[item] != currentValues[item]) {
-				update(item, originalValues[item])
-				document.querySelector('#' + item).value = originalValues[item]
-			}
-		}
+	document.querySelector('#discard').onclick = ({target}) => {
+		target.parentElement.style.display = 'none'
+		Object.assign(currentValues, originalValues)
+		update('plot')
+		setSliders()
+		apply(currentValues)
 		save()
 	}
 	document.querySelector('#reload').onclick = () => {
 		send('background', 'reload', 'reload')
 	}
-	let  title = document.querySelector('.title')
-	title.innerHTML = 'Loading'
+	let  title = document.querySelector('#title')
+	title.textContent = 'Loading'
 	send('content', 'notification', 'popup loaded')
+	send('background', 'themes', 'all')
 }

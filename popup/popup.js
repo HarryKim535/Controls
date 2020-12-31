@@ -146,6 +146,7 @@ function listener (message) {
 				setSliders()
 				update('plot')
 				apply(currentValues)
+				save()
 			}
 		}
 	}

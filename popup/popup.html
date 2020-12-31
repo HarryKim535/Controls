@@ -1,50 +1,50 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <script src="popup.js"></script>
-        <link rel="stylesheet" href="popup.css">
-    </head>
-    <body>
-        <div class="bundle">
-            <div class="title"></div>
-            <div class="slider onurl" id="range-container">
-                <input id="range" type="range" max="2" min="0" value="0" step="1">
-            </div>
-        </div>
-        <div class="bundle">
-            <div class="container onaudio">
-                <canvas id="plot" width="280px" height="280px">
-                </canvas>
-                <div class="slider oncanvas" id="threshold-container">
-                    <input id="threshold" type="range" title="threshold" max="0" min="-100" value="-24" step="2" >
-                    <div class="indicator"></div>
-                </div>
-                <div class="slider oncanvas" id="knee-container">
-                    <input id="knee" type="range" title="knee" max="40" min="0" value="30" step="1">
-                    <div class="indicator"></div>
-                </div>
-                <div class="slider oncanvas" id="ratio-container">
-                    <input id="ratio" type="range" title="ratio" max="20" min="1" value="12" step="1">
-                    <div class="indicator"></div>
-                </div>
-                <div class="slider oncanvas" id="gain-container">
-                    <input id="gain" type="range" title="gain" max="0.4" min="-3" value="0" step="0.2">
-                    <div class="indicator"></div>
-                </div>
-            </div>
-            <div class="container onaudio">
-                <div class="slider" id="release-container">
-                    <input id="release" type="range" title="release" max="1" min="0" value="0.25" step="0.05">
-                    <div class="indicator"></div>
-                </div>
-                <div class="onchange">
-                    <input id="discard" type="button" value="Discard">
-                </div>
-            </div>
-        </div>
-        <div class="bundle">
-            <input type="button" value="reload content script" id="reload">
-        </div>
-    </body>
+	<head>
+		<meta charset="utf-8">
+		<script src="popup.js"></script>
+		<link rel="stylesheet" href="popup.css">
+	</head>
+	<body>
+		<div class="bundle">
+			<div class="title"></div>
+			<div class="slider onurl" id="range-container">
+				<input id="range" type="range" max="2" min="0" value="0" step="1">
+			</div>
+		</div>
+		<div class="bundle">
+			<div class="container onaudio">
+				<canvas id="plot" width="280px" height="280px">
+				</canvas>
+				<div class="slider oncanvas" id="threshold-container">
+					<input id="threshold" type="range" title="threshold" max="0" min="-100" value="-24" step="2" >
+					<div class="indicator"></div>
+				</div>
+				<div class="slider oncanvas" id="knee-container">
+					<input id="knee" type="range" title="knee" max="40" min="0" value="30" step="1">
+					<div class="indicator"></div>
+				</div>
+				<div class="slider oncanvas" id="ratio-container">
+					<input id="ratio" type="range" title="ratio" max="20" min="1" value="12" step="1">
+					<div class="indicator"></div>
+				</div>
+				<div class="slider oncanvas" id="gain-container">
+					<input id="gain" type="range" title="gain" max="0.4" min="-3" value="0" step="0.2">
+					<div class="indicator"></div>
+				</div>
+			</div>
+			<div class="container onaudio">
+				<div class="slider" id="release-container">
+					<input id="release" type="range" title="release" max="1" min="0" value="0.25" step="0.05">
+					<div class="indicator"></div>
+				</div>
+				<div class="onchange">
+					<input id="discard" type="button" value="Discard">
+				</div>
+			</div>
+		</div>
+		<div class="bundle">
+			<input type="button" value="reload content script" id="reload">
+		</div>
+	</body>
 </html>

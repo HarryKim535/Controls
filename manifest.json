@@ -1,70 +1,70 @@
 {
-    "manifest_version": 2,
-    "name": "Controls",
-    "version": "1.0",
-    "description": "Every tweak I need",
-    "permissions": ["storage", "bookmarks", "tabs", "activeTab"],
-    "background": {
-        "scripts": ["background.js"],
-        "persistent": false
-    },
-    "browser_action": {
-        "default_popup": "popup/popup.html"
-    },
-    "content_scripts": [{
-        "matches": ["https://*/*"],
-        "js": ["content.js"]
-    }],
+	"manifest_version": 2,
+	"name": "Controls",
+	"version": "1.0",
+	"description": "Every tweak I need",
+	"permissions": ["storage", "bookmarks", "tabs", "activeTab"],
+	"background": {
+		"scripts": ["background.js"],
+		"persistent": false
+	},
+	"browser_action": {
+		"default_popup": "popup/popup.html"
+	},
+	"content_scripts": [{
+		"matches": ["https://*/*"],
+		"js": ["content.js"]
+	}],
 
-    "icons": {
-        "16": "icons/audio_active_16.png",
-        "32": "icons/audio_active_32.png",
-        "48": "icons/audio_active_48.png",
-        "128": "icons/audio_active_128.png"
-    },
-    "commands": {
-        "alt_0": {
-            "suggested_key": {
-                "default": "Alt+1"
-            },
-            "description": "Open First Bookmark in Bookmarks Bar"
-        },
-        "alt_1": {
-            "suggested_key": {
-                "default": "Alt+2"
-            },
-            "description": "Open Second Bookmark in Bookmarks Bar"
-        },
-        "alt_2": {
-            "suggested_key": {
-                "default": "Alt+3"
-            },
-            "description": "Open Third Bookmark in Bookmarks Bar"
-        },
-        "alt_3": {
-            "suggested_key": {
-                "default": "Alt+4"
-            },
-            "description": "Open Forth Bookmark in Bookmarks Bar"
-        },
-        "alt_4": {
-            "description": "Open Fifth Bookmark in Bookmarks Bar"
-        },
-        "alt_5": {
-            "description": "Open sixth Bookmark in Bookmarks Bar"
-        },
-        "alt_6": {
-            "description": "Open seventh Bookmark in Bookmarks Bar"
-        },
-        "alt_7": {
-            "description": "Open eighth Bookmark in Bookmarks Bar"
-        },
-        "alt_8": {
-            "description": "Open ninth Bookmark in Bookmarks Bar"
-        },
-        "alt_9": {
-            "description": "Open tenth Bookmark in Bookmarks Bar"
-        }
-    }
+	"icons": {
+		"16": "icons/audio_active_16.png",
+		"32": "icons/audio_active_32.png",
+		"48": "icons/audio_active_48.png",
+		"128": "icons/audio_active_128.png"
+	},
+	"commands": {
+		"alt_0": {
+			"suggested_key": {
+				"default": "Alt+1"
+			},
+			"description": "Open First Bookmark in Bookmarks Bar"
+		},
+		"alt_1": {
+			"suggested_key": {
+				"default": "Alt+2"
+			},
+			"description": "Open Second Bookmark in Bookmarks Bar"
+		},
+		"alt_2": {
+			"suggested_key": {
+				"default": "Alt+3"
+			},
+			"description": "Open Third Bookmark in Bookmarks Bar"
+		},
+		"alt_3": {
+			"suggested_key": {
+				"default": "Alt+4"
+			},
+			"description": "Open Forth Bookmark in Bookmarks Bar"
+		},
+		"alt_4": {
+			"description": "Open Fifth Bookmark in Bookmarks Bar"
+		},
+		"alt_5": {
+			"description": "Open sixth Bookmark in Bookmarks Bar"
+		},
+		"alt_6": {
+			"description": "Open seventh Bookmark in Bookmarks Bar"
+		},
+		"alt_7": {
+			"description": "Open eighth Bookmark in Bookmarks Bar"
+		},
+		"alt_8": {
+			"description": "Open ninth Bookmark in Bookmarks Bar"
+		},
+		"alt_9": {
+			"description": "Open tenth Bookmark in Bookmarks Bar"
+		}
+	}
 
 }

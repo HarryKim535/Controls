@@ -138,7 +138,7 @@ function listener (message) {
 				setUrl(currentValues.range)
 				setSliders()
 				update('plot')
-				for (let element of document.querySelectorAll('.onaudio')) element.style.display = 'inline'
+				for (let element of document.querySelectorAll('.onaudio')) element.style.display = 'flex'
 			}
 			else if (message.type == 'themes') {
 				currentThemes = message.content
@@ -205,6 +205,14 @@ window.onload = () => {
 		currentValues.range = target.valueAsNumber
 		setUrl(target.valueAsNumber)
 	}
+	document.querySelector('#select').onchange = ({target}) => {
+		let advanced = document.querySelector('#advanced')
+		let datatree = document.querySelector('#datatree')
+		advanced.style.display = 'none'
+		datatree.style.display = 'none'
+		if (target.value == 'advanced') advanced.style.display = 'block'
+		else if (target.value == 'datatree') datatree.style.display = 'block'
+	}
 	document.querySelector('#discard').onclick = ({target}) => {
 		target.parentElement.style.display = 'none'
 		Object.assign(currentValues, originalValues)
@@ -213,14 +221,19 @@ window.onload = () => {
 		apply(currentValues)
 		save()
 	}
-	document.querySelector('#newTheme').onkeydown = (event) => {
-		if(event.key == 'Enter') {
+	document.querySelector('#newtheme').onkeydown = (event) => {
+		if (event.key == 'Enter') {
+			if (event.target.value == '') return
 			for (item of currentThemes) {
-				if (item == event.target.value) return
+				if (item == event.target.value) {
+					event.target.value = ''
+					return
+				}
 			}
 			currentThemes.push(event.target.value)
 			addTheme(event.target.value)
 			saveTheme(event.target.value)
+			event.target.value = ''
 		}
 	}
 	document.querySelector('#reload').onclick = () => {

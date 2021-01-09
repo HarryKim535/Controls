@@ -1,5 +1,5 @@
 body {
-	min-width: 80px;
+	min-width: 100px;
 	padding: 1em;
 	margin: 0;
 }
@@ -46,12 +46,15 @@ input[type="range"]::-webkit-slider-thumb {
 	height: 20px;
 	background-color: black;
 }
+input[type="button"] {
+	min-width: 6em;
+}
 #plot {
 	border-bottom: solid 1px black;
 }
 .slider {
 	position: relative;
-	height: 2em;
+	height: 32px;
 }
 .slider.oncanvas {
 	position: absolute;
@@ -105,11 +108,19 @@ input[type="range"]:focus + .indicator {
 #range-container {
 	width: 20%;
 }
+#select {
+	margin: 0.5em;
+	margin-left: 1em;
+}
+input[name="type"] {
+	margin: 0.5em 0;
+}
 .sidemenu {
+	display: none;
 	height: 280px;
 }
-#advanced {
-	display: none;
+.top, .bottom {
+	height: 50%;
 }
 #release-container {
 	display: flex;
@@ -117,14 +128,16 @@ input[type="range"]:focus + .indicator {
 	width: 6em;
 	height: 2em;
 }
+#discard {
+	margin: 0.5em 0;
+}
 .list {
-	width: 8em;
+	width: 9em;
+	max-height: calc(100% - 2.5em);
+	margin-bottom: 1em;
 	overflow-y: scroll;
 	border: none;
 }
 .add {
 	padding-top: 1em;
-}
-#datatree {
-	display: none;
 }

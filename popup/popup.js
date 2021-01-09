@@ -1,6 +1,7 @@
 let currentUrl
 let currentValues
 let originalValues = {}
+let currentThemes
 let sliders = {all: ['threshold', 'knee', 'ratio', 'gain', 'release', 'range'], oncanvas: ['threshold', 'knee', 'ratio', 'gain'], onside: ['release'], ontitle: ['range']}
 
 function draw (canvas, values) {
@@ -91,7 +92,7 @@ function setSliders () {
 	for (let item of sliders.all) document.querySelector('#' + item).value = currentValues[item]
 }
 
-function addThemes (name) {
+function addTheme (name) {
 	let themes = document.querySelector('#themes')
 	let button = document.createElement('input')
 	button.type = 'button'
@@ -101,6 +102,10 @@ function addThemes (name) {
 		send('background', 'theme values', target.id)
 	}
 	themes.appendChild(button)
+}
+
+function saveTheme (name) {
+	send('background', 'save theme', {name: name, values: currentValues})
 }
 
 function listener (message) {
@@ -136,8 +141,9 @@ function listener (message) {
 				for (let element of document.querySelectorAll('.onaudio')) element.style.display = 'inline'
 			}
 			else if (message.type == 'themes') {
+				currentThemes = message.content
 				for (let item of message.content) {
-					addThemes(item)
+					addTheme(item)
 				}
 			}
 			else if (message.type == 'theme values') {
@@ -206,6 +212,16 @@ window.onload = () => {
 		setSliders()
 		apply(currentValues)
 		save()
+	}
+	document.querySelector('#newTheme').onkeydown = (event) => {
+		if(event.key == 'Enter') {
+			for (item of currentThemes) {
+				if (item == event.target.value) return
+			}
+			currentThemes.push(event.target.value)
+			addTheme(event.target.value)
+			saveTheme(event.target.value)
+		}
 	}
 	document.querySelector('#reload').onclick = () => {
 		send('background', 'reload', 'reload')

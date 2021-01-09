@@ -38,7 +38,7 @@
 				<input type="radio" name="type" value="advanced">
 				<input type="radio" name="type" value="datatree">
 			</div>
-			<div class="container onaudio" id="advanced">
+			<div class="container onaudio sidemenu" id="advanced">
 				<div class="slider" id="release-container">
 					<input id="release" type="range" title="release" max="1" min="0" value="0.25" step="0.05">
 					<div class="indicator"></div>
@@ -47,8 +47,13 @@
 					<input id="discard" type="button" value="Discard">
 				</div>
 				<div class="list" id="themes"></div>
+				<div class="add">
+					<div>
+						<input id="newTheme" type="text" size="10" placeholder="New Theme">
+					</div>
+				</div>
 			</div>
-			<div class="container onaudio" id="datatree"></div>
+			<div class="container onaudio sidemenu" id="datatree"></div>
 		</div>
 		<div class="bundle" style="display: none;">
 			<input type="button" value="reload content script" id="reload">

@@ -51,6 +51,7 @@ input[type="range"]::-webkit-slider-thumb {
 }
 .slider {
 	position: relative;
+	height: 2em;
 }
 .slider.oncanvas {
 	position: absolute;
@@ -101,23 +102,29 @@ input[type="range"]:focus + .indicator {
 #ratio-container .indicator, #gain-container .indicator, #release-container .indicator {
 	transform: rotate(90deg) translate(0, 40%);
 }
-#release-container {
-	width: 6em;
-	transform-origin: right;
-	transform: rotate(-90deg) translateX(-100%);
-}
 #range-container {
 	width: 20%;
+}
+.sidemenu {
+	height: 280px;
 }
 #advanced {
 	display: none;
 }
-#datatree {
-	display: none;
+#release-container {
+	display: flex;
+	align-items: center;
+	width: 6em;
+	height: 2em;
 }
 .list {
 	width: 8em;
-	height: 70%;
 	overflow-y: scroll;
 	border: none;
+}
+.add {
+	padding-top: 1em;
+}
+#datatree {
+	display: none;
 }

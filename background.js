@@ -105,6 +105,13 @@ function listener (message) {
 					send('popup', 'theme values', audio.themes[message.content])
 				})
 			}
+			else if (message.type == 'save theme') {
+				chrome.storage.local.get(['audio'], ({audio}) => {
+					audio.themes[message.content.name] = message.content.values
+					console.log(audio)
+					chrome.storage.local.set({audio: audio})
+				})
+			}
 			else if (message.type == 'reload') {
 				chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
 						chrome.tabs.executeScript(tabs[0].id, { file: "content.js" });

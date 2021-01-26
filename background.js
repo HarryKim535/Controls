@@ -1,3 +1,12 @@
+function test () {
+	var c = new Connector('test')
+	c.standby()
+}
+
+chrome.management.getSelf(({id}) => {
+	chrome.storage.local.set({ExtensionId: id})
+})
+
 chrome.runtime.onInstalled.addListener(init)
 
 chrome.bookmarks.onChanged.addListener(loadBookmarks)
@@ -13,6 +22,7 @@ chrome.runtime.onMessage.addListener(listener)
 function init () {
 	config()
 	loadBookmarks()
+	test()
 }
 function config () {
 	chrome.storage.local.set({audio : {
@@ -112,11 +122,6 @@ function listener (message) {
 					chrome.storage.local.set({audio: audio})
 				})
 			}
-			else if (message.type == 'reload') {
-				chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-						chrome.tabs.executeScript(tabs[0].id, { file: "content.js" });
-				});
-			} 
 		}
 	}
 }

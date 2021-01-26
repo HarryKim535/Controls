@@ -2,8 +2,10 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<script src="popup.js"></script>
-		<link rel="stylesheet" href="popup.css">
+		<script src="lib/jquery.js"></script>
+		<script src="lib/core.js"></script>
+		<script src="popup/popup.js"></script>
+		<link rel="stylesheet" href="popup/popup.css">
 	</head>
 	<body>
 		<div class="bundle">
@@ -47,6 +49,9 @@
 					<div class="onchange">
 						<input id="discard" type="button" value="Discard">
 					</div>
+					<div>
+						<input id="capture" type="button" value="Capture">
+					</div>
 				</div>
 				<div class="bottom">
 					<div class="list" id="themes"></div>
@@ -54,9 +59,6 @@
 				</div>
 			</div>
 			<div class="container sidemenu" id="datatree"></div>
-		</div>
-		<div class="bundle" style="display: none;">
-			<input type="button" value="reload content script" id="reload">
 		</div>
 	</body>
 </html>

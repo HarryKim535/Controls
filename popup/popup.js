@@ -4,6 +4,12 @@ let originalValues = {}
 let currentThemes
 let sliders = {all: ['threshold', 'knee', 'ratio', 'gain', 'release', 'range'], oncanvas: ['threshold', 'knee', 'ratio', 'gain'], onside: ['release'], ontitle: ['range']}
 
+function test () {
+	var c = new Connector('test')
+	c.connect()
+	c.post('hi')
+}
+
 function draw (canvas, values) {
 	let context = canvas.getContext('2d')
 	let span = canvas.width/140
@@ -169,7 +175,6 @@ function send (to, type, content) {
 	}
 }
 
-
 window.onload = () => {
 	chrome.runtime.onMessage.addListener(listener)
 	for (let item of sliders.oncanvas) {
@@ -236,11 +241,17 @@ window.onload = () => {
 			event.target.value = ''
 		}
 	}
-	document.querySelector('#reload').onclick = () => {
-		send('background', 'reload', 'reload')
-	}
+	$('#capture').click(event => { 
+		chrome.tabCapture.capture({audio: true}, (stream) => {
+			let audioCtx = new AudioContext()
+			let source = audioCtx.createMediaStreamSource(stream)
+			source.connect(audioCtx.destination)
+			console.log('captured')
+		})
+	});
 	let  title = document.querySelector('#title')
 	title.textContent = 'Loading'
 	send('content', 'notification', 'popup loaded')
 	send('background', 'themes', 'all')
+	test()
 }

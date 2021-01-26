@@ -1,6 +1,8 @@
 function test () {
 	var c = new Connector('test')
 	c.standby()
+	var d = new Connector('test')
+	d.standby()
 }
 
 chrome.management.getSelf(({id}) => {

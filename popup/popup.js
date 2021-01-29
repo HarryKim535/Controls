@@ -6,8 +6,7 @@ let sliders = {all: ['threshold', 'knee', 'ratio', 'gain', 'release', 'range'], 
 
 function test () {
 	var c = new Connector('test')
-	c.connect()
-	c.post('hi')
+	c.send('source')
 }
 
 function draw (canvas, values) {

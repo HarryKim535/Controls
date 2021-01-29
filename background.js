@@ -1,8 +1,5 @@
 function test () {
-	var c = new Connector('test')
-	c.standby()
-	var d = new Connector('test')
-	d.standby()
+	var a = new AudioControl('test', 0)
 }
 
 chrome.management.getSelf(({id}) => {

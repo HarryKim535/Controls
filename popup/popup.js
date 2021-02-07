@@ -6,7 +6,7 @@ let sliders = {all: ['threshold', 'knee', 'ratio', 'gain', 'release', 'range'], 
 
 function test () {
 	var c = new Connector('test')
-	c.send('source')
+	
 }
 
 function draw (canvas, values) {
@@ -69,11 +69,11 @@ function update (canvas) {
 }
 
 function apply(values) {
-	send('content', 'apply', values)
+	//send('content', 'apply', values)
 }
 
 function save() {
-	send('background', 'save', {url: currentUrl, values: currentValues})
+	//send('background', 'save', {url: currentUrl, values: currentValues})
 }
 
 function connect (target) {
@@ -104,13 +104,13 @@ function addTheme (name) {
 	button.value = name
 	button.id = name
 	button.onclick = ({target}) => {
-		send('background', 'theme values', target.id)
+		//send('background', 'theme values', target.id)
 	}
 	themes.appendChild(button)
 }
 
 function saveTheme (name) {
-	send('background', 'save theme', {name: name, values: currentValues})
+	//send('background', 'save theme', {name: name, values: currentValues})
 }
 
 function listener (message) {
@@ -127,12 +127,12 @@ function listener (message) {
 					let slider = document.querySelector('#range-container')
 					title.textContent = currentUrl.host
 					slider.style.display = 'block'
-					send('background', 'values', currentUrl)
+					//send('background', 'values', currentUrl)
 				}
 			}
 			else if (message.type == 'notification') {
 				if (message.content = 'window loaded') {
-					send('content', 'notification', 'popup loaded')
+					//send('content', 'notification', 'popup loaded')
 				}
 			}
 		}
@@ -250,7 +250,7 @@ window.onload = () => {
 	});
 	let  title = document.querySelector('#title')
 	title.textContent = 'Loading'
-	send('content', 'notification', 'popup loaded')
-	send('background', 'themes', 'all')
+	//send('content', 'notification', 'popup loaded')
+	//send('background', 'themes', 'all')
 	test()
 }

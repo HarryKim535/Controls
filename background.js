@@ -64,14 +64,14 @@ function listener (message) {
 		if (message.from == 'content') {
 			if (message.type == 'values') {
 				chrome.storage.local.get(['audio'], ({audio}) => {
-					send('content', 'values', getValues(audio, message.content))
+					//send('content', 'values', getValues(audio, message.content))
 				})
 			}
 		}
 		else if (message.from == 'popup') {
 			if (message.type == 'values') {
 				chrome.storage.local.get(['audio'], ({audio}) => {
-					send('popup', 'values', getValues(audio, message.content))
+					//send('popup', 'values', getValues(audio, message.content))
 				})
 			}
 			else if (message.type == 'save') {
@@ -105,13 +105,13 @@ function listener (message) {
 			}
 			else if (message.type == 'themes') {
 				chrome.storage.local.get(['audio'], ({audio}) => {
-					send('popup', 'themes', Object.keys(audio.themes))
+					//send('popup', 'themes', Object.keys(audio.themes))
 				})
 			}
 			else if (message.type == 'theme values') {
 				chrome.storage.local.get(['audio'], ({audio}) => {
 					console.log(audio.themes[message.content])
-					send('popup', 'theme values', audio.themes[message.content])
+					//send('popup', 'theme values', audio.themes[message.content])
 				})
 			}
 			else if (message.type == 'save theme') {

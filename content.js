@@ -3,6 +3,11 @@ let compressor
 let gain
 let source
 
+function test () {
+	var a = new AudioControl('test', 1)
+	a.getSource()
+}
+
 function setup () {
 	audioContext = new AudioContext()
 	compressor = audioContext.createDynamicsCompressor()
@@ -13,11 +18,13 @@ function setup () {
 	gain.connect(audioContext.destination)
 }
 
+//done
 function getAudio () {
 	let audio = document.querySelector('video')
 	if (!audio) audio = document.querySelector('audio')
 	return audio
 }
+
 
 function setCompressor (values) {
 	for (let item in values) {
@@ -71,12 +78,13 @@ function send (to, type, content) {
 
 window.onload = function () {
 	chrome.runtime.onMessage.addListener(listener)
-	send('popup', 'notification', 'window loaded')
-	if (!getAudio()) {
-		return
-	}
-	else {
-		setup()
-		send('background', 'values', getUrl())
-	}
+	test()
+	//send('popup', 'notification', 'window loaded')
+	//if (!getAudio()) {
+	//	return
+	//}
+	//else {
+	//	setup()
+	//	send('background', 'values', getUrl())
+	//}
 }

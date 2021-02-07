@@ -72,12 +72,8 @@ function listener (message) {
 	}
 }
 
-function send (to, type, content) {
-	chrome.runtime.sendMessage({to: to, from: 'content', type: type, content: content})
-}
-
 window.onload = function () {
-	chrome.runtime.onMessage.addListener(listener)
+	//chrome.runtime.onMessage.addListener(listener)
 	test()
 	//send('popup', 'notification', 'window loaded')
 	//if (!getAudio()) {

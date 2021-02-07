@@ -7,16 +7,7 @@ chrome.management.getSelf(({id}) => {
 })
 
 chrome.runtime.onInstalled.addListener(init)
-
-chrome.bookmarks.onChanged.addListener(loadBookmarks)
-chrome.bookmarks.onChildrenReordered.addListener(loadBookmarks)
-chrome.bookmarks.onCreated.addListener(loadBookmarks)
-chrome.bookmarks.onImportEnded.addListener(loadBookmarks)
-chrome.bookmarks.onMoved.addListener(loadBookmarks)
-chrome.bookmarks.onRemoved.addListener(loadBookmarks)
-
-chrome.commands.onCommand.addListener(openBookmarks)
-chrome.runtime.onMessage.addListener(listener)
+//chrome.runtime.onMessage.addListener(listener)
 
 function init () {
 	config()
@@ -24,38 +15,21 @@ function init () {
 	test()
 }
 function config () {
-	chrome.storage.local.set({audio : {
-		themes: {
-			Default : {
+	chrome.storage.local.set({data : {
+		0 : {
+			url : UrlCreator.jsonify,
+			urlRange : 0,
+			compValues : {
 				"threshold": -24,
 				"knee": 30,
 				"ratio": 12,
 				"release": 0.25,
-				"gain": 0,
-				"range": 0
-			}
+			},
+			gainValue : {
+				"gain": 0
+			},
 		}
 	}})
-}
-
-async function loadBookmarks () {
-	chrome.bookmarks.getChildren('1', bookmarks => {
-		let alt = new Array(10)
-		for (let i in bookmarks) {
-			alt[i] = bookmarks[i].url
-		}
-		chrome.storage.local.set({alt : alt})
-	})
-}
-
-function openBookmarks (command) {
-	chrome.storage.local.get(['alt'], ({alt}) => {
-		let re = /(\w+)_(\d)/
-		let [_, key, index] = command.match(re)
-		if (key == 'alt') {
-			chrome.tabs.create({url: alt[index]})
-		}
-	})
 }
 
 function listener (message) {
@@ -124,19 +98,6 @@ function listener (message) {
 		}
 	}
 }
-
-function send (to, type, content) {
-	if (to == 'content') {
-		chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-			chrome.tabs.sendMessage(tabs[0].id, {to: to, from: 'background', type: type, content: content})
-		})
-	}
-	else {
-		chrome.runtime.sendMessage({to: to, from: 'background', type: type, content: content})
-	}
-}
-
-
 function getValues (audio, url) {
 	let host = audio[url.host]
 	if (host) {

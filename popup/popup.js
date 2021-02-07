@@ -175,7 +175,7 @@ function send (to, type, content) {
 }
 
 window.onload = () => {
-	chrome.runtime.onMessage.addListener(listener)
+	//chrome.runtime.onMessage.addListener(listener)
 	for (let item of sliders.oncanvas) {
 		let slider = document.querySelector('#' + item)
 		slider.onfocus = ({target}) => {
@@ -240,7 +240,7 @@ window.onload = () => {
 			event.target.value = ''
 		}
 	}
-	$('#capture').click(event => { 
+	document.getElementById('capture').onclick(event => { 
 		chrome.tabCapture.capture({audio: true}, (stream) => {
 			let audioCtx = new AudioContext()
 			let source = audioCtx.createMediaStreamSource(stream)

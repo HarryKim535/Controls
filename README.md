@@ -6,7 +6,7 @@
 - Save a configuration as a "Theme"
 - Url seperated by Host/Path/Search and configurations cascades
 - Dual Source
- - Element Source from `Audio Element` and `Tab Capture`
+-- Element Source from `Audio Element` and `Tab Capture`
 ## Future Updates
 - Adaptive Sound Modification
 - Integration of Sound Equalizer
